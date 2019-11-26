@@ -2,10 +2,6 @@
 
 A basic gradle project for java application development.
 
-## [Build](BUILD.md)
-
-Read the build file on how to build the application.
-
 ## Usage
 
 1. **Clone** this repository on your local.
@@ -19,6 +15,14 @@ Read the build file on how to build the application.
    ```
 
    > If it completes successfully your setup is good.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## [Build](BUILD.md)
+
+## [Changelog](CHANGELOG.md)
 
 ## Author
 

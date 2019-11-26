@@ -1,5 +1,12 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
 plugins {
     id 'java'
+    id "org.javamodularity.moduleplugin" version "1.6.0"
+    id 'org.beryx.jlink' version '2.16.4'
 }
 
 group 'xyz.ronella.template'
@@ -20,13 +27,113 @@ repositories {
 dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.1'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
+    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.5.2'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
 }
 
+ext.packageName = "${project.name}-${version}"
+
 test {
     useJUnitPlatform()
+}
+
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher{
+        moduleName = 'template.java.application'
+        mainClassName = 'template.java.application/xyz.ronella.template.app.Main'
+    }
+    forceMerge('log4j-api')
+    imageName = packageName
+}
+
+processResources {
+    def resources = ['xml', 'properties']
+    doFirst {
+        sourceSets.main.output.asList().stream()
+                .filter{___file -> ___file.path.matches(".*java.?main\$")}
+                .findFirst().ifPresent { ___file ->
+
+            def sourceDir = sourceSets.main.resources.sourceDirectories.asPath
+            def destinationDir = ___file.path
+
+            copy {
+                from(sourceDir) {
+                    include resources.stream().map{ ___ext -> "**/*.${___ext}"}.collect(Collectors.toList())
+                }
+                into(destinationDir)
+            }
+        }
+    }
+    doLast {
+        sourceSets.main.output.asList().stream()
+                .filter{___file -> ___file.path.matches(".*resources.?main\$")}
+                .findFirst().ifPresent { _1_file ->
+
+            Stream<Path> stream = Files.walk(Paths.get(_1_file.path))
+            try {
+                def fileToDelete = stream.filter{___path -> Files.isRegularFile(___path) &&
+                        resources.stream().any {___ext -> ___path.toFile().path.endsWith(___ext)}
+                }.map{___path -> ___path.toFile()}
+                        .collect(Collectors.toList()).toArray()
+
+                if (fileToDelete.size()>0) {
+                    delete {
+                        delete fileToDelete
+                    }
+                }
+            }
+            finally {
+                stream.close()
+            }
+        }
+    }
+}
+
+task preparePackage(dependsOn: ['jlink']) {
+    group = "build"
+    doLast {
+        def resourceDir = sourceSets.main.resources.sourceDirectories.asPath
+        def jlinkOutputDir = Paths.get(buildDir.absolutePath, packageName)
+        def jlinkOutputBinDir = Paths.get(jlinkOutputDir.toString(), 'bin')
+
+        def jlinkOutputBinDirFile = jlinkOutputBinDir.toFile();
+        if (!jlinkOutputBinDirFile.exists()) {
+            jlinkOutputBinDirFile.mkdirs()
+        }
+
+        copy {
+            from(resourceDir)
+            into(jlinkOutputDir)
+            include "*.bat"
+        }
+
+        copy {
+            from(resourceDir)
+            into(jlinkOutputBinDir)
+            include "log4j2-release.xml"
+            rename "log4j2-release.xml", "log4j2.xml"
+        }
+
+        def packageFile = Paths.get(jlinkOutputBinDir.toString(), "___package___").toFile();
+        if (!packageFile.exists()) {
+            packageFile.createNewFile();
+        }
+    }
+}
+
+task packWin(dependsOn: ['preparePackage']) {
+    group = "build"
+    doLast {
+        def jlinkOutputDir = Paths.get(buildDir.absolutePath, packageName)
+        def outputFile = Paths.get(buildDir.absolutePath, 'pack', "${packageName}-win64.zip")
+        ant.zip(destfile: outputFile) {
+            fileset(dir: jlinkOutputDir)
+        }
+    }
 }
