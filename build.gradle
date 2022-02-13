@@ -48,7 +48,7 @@ jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher{
         moduleName = 'template.java.application'
-        mainClassName = 'template.java.application/xyz.ronella.template.app.Main'
+        mainClassName = 'xyz.ronella.template.app.Main'
     }
     forceMerge('log4j-api')
     imageName = packageName
