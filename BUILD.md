@@ -4,35 +4,6 @@
 
 * Java 17
 
-* Create or update **<USER_HOME>\\.gradle\\gradle.properties** to have the following properties:
-
-    ```properties
-    artifactoryUsername=<VALID_USERNAME>
-    artifactoryPassword=<VALID_PASSWORD>
-    ```
-
-    > If you don't have access to my **artifactory**, update all the **repositories section** in the **build.gradle** file **after cloning**, from:
-    >
-    > ```
-    > repositories {
-    >      maven {
-    >            url 'https://repo.ronella.xyz/artifactory/java-central'
-    >            credentials {
-    >                username "${artifactoryUsername}"
-    >                password "${artifactoryPassword}"
-    >            }
-    >      }
-    >  }
-    >    ```
-    >    
-    >    to
-    >    
-    >    ```
-    >  repositories {
-    > 	mavenCentral()
-    > }
-    >```
-
 ## Testing
 
 Run the following command to test the application:
@@ -52,3 +23,21 @@ gradlew build
 ```
 
 > The preceding command must be run from the location where you've cloned the repository.
+
+## Packaging
+
+Run the following command to build the application:
+
+```
+gradlew packWin
+```
+
+> The preceding command must be run from the location where you've cloned the repository.
+
+> The package will be available in following directory:
+>
+> ```
+> <REPO_DIR>\build\pack
+> ```
+>
+> REPO_DIR is the location where you've cloned the repository.

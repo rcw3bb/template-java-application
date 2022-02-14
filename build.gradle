@@ -4,25 +4,37 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 plugins {
-    id 'java'
+    id 'application'
     id "org.javamodularity.moduleplugin" version "1.8.10"
     id 'org.beryx.jlink' version '2.24.4'
 }
 
-
-
-group 'xyz.ronella.template'
-version '1.0-SNAPSHOT'
+group GROUP
+version VERSION
 
 sourceCompatibility = 1.17
 
+application {
+    mainModule = MAIN_MODULE
+    mainClass = MAIN_CLASS
+}
+
 repositories {
-    maven {
-        url 'https://repo.ronella.xyz/artifactory/java-central'
-        credentials {
-            username "${artifactoryUsername}"
-            password "${artifactoryPassword}"
+    if (Boolean.valueOf(USE_PRIVATE_REPO)) {
+        println "Using Private Repository"
+
+        //Replace the following with your own repository.
+        maven {
+            url 'https://repo.ronella.xyz/artifactory/java-central'
+            credentials {
+                username "${artifactoryUsername}"
+                password "${artifactoryPassword}"
+            }
         }
+    }
+    else {
+        println "Using mavenCentral"
+        mavenCentral()
     }
 }
 
@@ -46,10 +58,6 @@ test {
 
 jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    launcher{
-        moduleName = 'template.java.application'
-        mainClassName = 'xyz.ronella.template.app.Main'
-    }
     forceMerge('log4j-api')
     imageName = packageName
 }
