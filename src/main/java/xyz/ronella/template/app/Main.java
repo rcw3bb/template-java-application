@@ -1,12 +1,12 @@
 package xyz.ronella.template.app;
 
-import org.apache.logging.log4j.LogManager;
+import xyz.ronella.logging.LoggerPlus;
 import xyz.ronella.template.app.commons.ArgsMgr;
-import xyz.ronella.template.app.commons.LoggerPlus;
+import org.slf4j.LoggerFactory;
 
 public class Main {
 
-    private final static LoggerPlus LOGGER_PLUS = new LoggerPlus(LogManager.getLogger(Main.class));
+    private final static LoggerPlus LOGGER_PLUS = new LoggerPlus(LoggerFactory.getLogger(Main.class));
 
     public static void main(String[] args) {
         try (var mLOG = LOGGER_PLUS.logByMethodCall("main")) {

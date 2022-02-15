@@ -1,14 +1,13 @@
 package xyz.ronella.template.app.commons;
 
 import org.apache.commons.cli.*;
-import org.apache.logging.log4j.LogManager;
 
-import java.nio.file.Paths;
+import org.slf4j.LoggerFactory;
+import xyz.ronella.logging.LoggerPlus;
+
 import java.util.function.BiConsumer;
 
 public class ArgsMgr {
-
-    private final static LoggerPlus LOGGER_PLUS = new LoggerPlus(LogManager.getLogger(ArgsMgr.class));
 
     private String name;
 
