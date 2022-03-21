@@ -1,10 +1,6 @@
 package xyz.ronella.template.app.commons;
 
 import org.apache.commons.cli.*;
-
-import org.slf4j.LoggerFactory;
-import xyz.ronella.logging.LoggerPlus;
-
 import java.util.function.BiConsumer;
 
 public class ArgsMgr {
