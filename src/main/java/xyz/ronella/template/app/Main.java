@@ -9,7 +9,7 @@ public class Main {
     private final static LoggerPlus LOGGER_PLUS = new LoggerPlus(LoggerFactory.getLogger(Main.class));
 
     public static void main(String[] args) {
-        try (var mLOG = LOGGER_PLUS.logByMethodCall("main")) {
+        try (var mLOG = LOGGER_PLUS.groupLog("main")) {
             ArgsMgr argsMgr = ArgsMgr.build(args);
 
             if (argsMgr.shouldExit()) {

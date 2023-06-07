@@ -43,14 +43,12 @@ public class ArgsMgr {
     }
 
     private static void addGenericParamOption(Options options) {
-        if (!PackageMgr.isPackaged()) {
-            Option genericParam = new Option("D", true, "Generic Parameter");
-            genericParam.setRequired(false);
-            genericParam.setArgName("parameter=value");
-            genericParam.setArgs(2);
-            genericParam.setValueSeparator('=');
-            options.addOption(genericParam);
-        }
+        Option genericParam = new Option("D", true, "Generic Parameter");
+        genericParam.setRequired(false);
+        genericParam.setArgName("parameter=value");
+        genericParam.setArgs(2);
+        genericParam.setValueSeparator('=');
+        options.addOption(genericParam);
     }
 
     public static ArgsMgr build(String[] args) {
