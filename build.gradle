@@ -1,6 +1,8 @@
 import java.nio.file.Paths
 import org.apache.tools.ant.filters.ReplaceTokens
 
+import java.text.SimpleDateFormat
+
 plugins {
     id 'application'
     id "org.javamodularity.moduleplugin" version "1.8.12"
@@ -10,7 +12,8 @@ plugins {
 group GROUP
 version VERSION
 
-sourceCompatibility = 1.17
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 application {
     mainModule = moduleName
@@ -38,7 +41,11 @@ dependencies {
 
 ext {
     packageName = "${project.name}-${version}"
-    FILTER_TOKEN = ['project.name': project.name]
+    FILTER_TOKEN = [
+            'project.name': project.name
+            ,'app.version' : version
+            ,'build.date' : new SimpleDateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(new Date())
+    ]
 }
 
 test {
@@ -96,6 +103,7 @@ task preparePackage(dependsOn: ['jlink']) {
             from(mainResources)
             into(jlinkConfDir)
             filter(ReplaceTokens, tokens : FILTER_TOKEN)
+            exclude('app-info.properties')
         }
 
         if (batchPath.exists()) {

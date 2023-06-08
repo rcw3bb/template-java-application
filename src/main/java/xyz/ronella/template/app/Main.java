@@ -1,7 +1,6 @@
 package xyz.ronella.template.app;
 
 import xyz.ronella.logging.LoggerPlus;
-import xyz.ronella.template.app.commons.ArgsMgr;
 import org.slf4j.LoggerFactory;
 
 public class Main {
@@ -10,18 +9,26 @@ public class Main {
 
     public static void main(String[] args) {
         try (var mLOG = LOGGER_PLUS.groupLog("main")) {
-            ArgsMgr argsMgr = ArgsMgr.build(args);
+            final var appInfo = AppInfo.INSTANCE;
+            final var header = String.format("%s v%s (%s)"
+                    , appInfo.getAppName()
+                    , appInfo.getAppVersion()
+                    , appInfo.getBuildDate()
+            );
+            mLOG.info(header);
+
+            final var argsMgr = ArgsMgr.build(args);
 
             if (argsMgr.shouldExit()) {
                 return;
             }
 
-            Main main = new Main();
+            final var main = new Main();
             mLOG.info(main.hello(argsMgr.getName()));
         }
     }
 
-    public String hello(String name) {
+    public String hello(final String name) {
         return String.format("Hello %s", name);
     }
 

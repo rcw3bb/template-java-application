@@ -1,6 +1,7 @@
-package xyz.ronella.template.app.commons;
+package xyz.ronella.template.app;
 
 import org.apache.commons.cli.*;
+
 import java.util.function.BiConsumer;
 
 public class ArgsMgr {
@@ -20,7 +21,7 @@ public class ArgsMgr {
     private ArgsMgr() {
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -28,22 +29,22 @@ public class ArgsMgr {
         return this.name;
     }
 
-    private static void addNameOption(Options options) {
-        Option nameOption = new Option("n", "name", true
+    private static void addNameOption(final Options options) {
+        final var nameOption = new Option("n", "name", true
                 , "Name of a person.");
         nameOption.setRequired(true);
         options.addOption(nameOption);
     }
 
-    private static void addHelpOption(Options options) {
-        Option provisionOption = new Option("h", "help", false
+    private static void addHelpOption(final Options options) {
+        final var provisionOption = new Option("h", "help", false
                 , "Shows the help information.");
         provisionOption.setRequired(false);
         options.addOption(provisionOption);
     }
 
-    private static void addGenericParamOption(Options options) {
-        Option genericParam = new Option("D", true, "Generic Parameter");
+    private static void addGenericParamOption(final Options options) {
+        final var genericParam = new Option("D", true, "Generic Parameter");
         genericParam.setRequired(false);
         genericParam.setArgName("parameter=value");
         genericParam.setArgs(2);
@@ -52,19 +53,20 @@ public class ArgsMgr {
     }
 
     public static ArgsMgr build(String[] args) {
-        var argManager = new ArgsMgr();
-        Options options = new Options();
+        final var argManager = new ArgsMgr();
+        final var options = new Options();
 
         addNameOption(options);
         addGenericParamOption(options);
         addHelpOption(options);
 
-        CommandLineParser parser = new DefaultParser();
+        final var parser = new DefaultParser();
         CommandLine cmd = null;
 
-        BiConsumer<ArgsMgr, Options> showHelpInfo = (___argManager, ___options) -> {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("template-java-application", ___options);
+        final BiConsumer<ArgsMgr, Options> showHelpInfo = (___argManager, ___options) -> {
+            final var formatter = new HelpFormatter();
+            final var appName = AppInfo.INSTANCE.getAppName();
+            formatter.printHelp(appName, ___options);
             ___argManager.setShouldExit(true);
         };
 
