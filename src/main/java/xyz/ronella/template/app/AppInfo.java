@@ -12,7 +12,7 @@ final public class AppInfo {
 
     private static final LoggerPlus LOGGER_PLUS = new LoggerPlus(LoggerFactory.getLogger(AppInfo.class));
     private static final String CONFIG_FILE = "app-info.properties";
-    private ResourceBundle prop = null;
+    private transient ResourceBundle prop = null;
 
     public static final AppInfo INSTANCE = new AppInfo();
     private AppInfo() {

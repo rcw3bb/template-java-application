@@ -2,21 +2,19 @@ package xyz.ronella.template.app;
 
 import org.apache.commons.cli.*;
 
-import java.util.function.BiConsumer;
-
 public class ArgsMgr {
 
     private String name;
 
     public boolean shouldExit() {
-        return shouldExit;
+        return exit;
     }
 
-    public void setShouldExit(boolean shouldExit) {
-        this.shouldExit = shouldExit;
+    public void setShouldExit(boolean exit) {
+        this.exit = exit;
     }
 
-    private boolean shouldExit;
+    private transient boolean exit;
 
     private ArgsMgr() {
     }
@@ -52,6 +50,13 @@ public class ArgsMgr {
         options.addOption(genericParam);
     }
 
+    private static void helpInfo(final ArgsMgr argMgr, final Options options) {
+        final var formatter = new HelpFormatter();
+        final var appName = AppInfo.INSTANCE.getAppName();
+        formatter.printHelp(appName, options);
+        argMgr.setShouldExit(true);
+    }
+
     public static ArgsMgr build(String[] args) {
         final var argManager = new ArgsMgr();
         final var options = new Options();
@@ -63,23 +68,16 @@ public class ArgsMgr {
         final var parser = new DefaultParser();
         CommandLine cmd = null;
 
-        final BiConsumer<ArgsMgr, Options> showHelpInfo = (___argManager, ___options) -> {
-            final var formatter = new HelpFormatter();
-            final var appName = AppInfo.INSTANCE.getAppName();
-            formatter.printHelp(appName, ___options);
-            ___argManager.setShouldExit(true);
-        };
-
         try {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("help")) {
-                showHelpInfo.accept(argManager, options);
+                helpInfo(argManager, options);
             } else {
                 argManager.setName(cmd.getOptionValue("name"));
             }
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            showHelpInfo.accept(argManager, options);
+            helpInfo(argManager, options);
         }
 
         return argManager;
