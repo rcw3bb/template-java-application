@@ -5,21 +5,27 @@ import java.text.SimpleDateFormat
 
 plugins {
     id 'application'
-    id "org.javamodularity.moduleplugin" version "1.8.12"
-    id 'org.beryx.jlink' version '2.25.0'
+    id "org.javamodularity.moduleplugin" version "1.8.15"
+    id 'org.beryx.jlink' version '3.0.1'
     id 'jacoco'
     id 'pmd'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 group GROUP
 version VERSION
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
 
 application {
     mainModule = moduleName
     mainClass = MAIN_CLASS
+}
+
+shadowJar {
+    archiveClassifier.set("exe")
 }
 
 repositories {
@@ -27,18 +33,18 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.19.0'
-    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
 
-    implementation 'commons-cli:commons-cli:1.5.0'
-    implementation 'xyz.ronella.casual:trivial-chunk:2.15.0'
+    implementation 'commons-cli:commons-cli:1.7.0'
+    implementation 'xyz.ronella.casual:trivial-chunk:2.18.0'
     implementation 'xyz.ronella.logging:logger-plus:1.2.0'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 
-    testImplementation 'org.mockito:mockito-core:4.3.1'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
 }
 
 ext {
@@ -63,15 +69,6 @@ jlink {
         mainClassName = application.mainClass
         jvmArgs = ['-Dlog4j.configurationFile={{BIN_DIR}}\\conf\\log4j2.xml']
     }
-    mergedModule {
-        additive = true
-        uses 'org.apache.logging.log4j.spi.Provider'
-        uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
-        uses 'org.apache.logging.log4j.core.util.ContextDataProvider'
-        uses 'org.apache.logging.log4j.util.PropertySource'
-        uses 'org.apache.logging.log4j.core.util.WatchEventService'
-    }
-    forceMerge('slf4j-api','log4j-api')
     imageName = packageName.toString()
 }
 
@@ -82,6 +79,15 @@ processResources {
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version
+        )
     }
 }
 
