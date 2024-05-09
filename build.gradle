@@ -1,7 +1,14 @@
+import xyz.ronella.trivial.handy.CommandLocator
+
 import java.nio.file.Paths
 import org.apache.tools.ant.filters.ReplaceTokens
-
 import java.text.SimpleDateFormat
+
+buildscript {
+    dependencies {
+        classpath 'xyz.ronella.casual:trivial-chunk:2.18.0'
+    }
+}
 
 plugins {
     id 'application'
@@ -165,4 +172,20 @@ task packWin(group: 'distribution', dependsOn: ['jlink']) {
             fileset(dir: jlinkOutputDir)
         }
     }
+}
+
+task buildExec(type: Exec, group: 'distribution', dependsOn: [shadowJar]) {
+    def binDir = Paths.get(buildDir.absolutePath, 'bin').toFile()
+
+    doFirst {
+        if (!binDir.exists()) {
+            binDir.mkdirs()
+        }
+    }
+
+    def nativeExec = CommandLocator.locateAsString("native-image")
+    def libsDir = Paths.get(buildDir.absolutePath, 'libs').toFile().absolutePath
+    def fatJar = Paths.get(libsDir, "${packageName}-exe.jar").toFile().absolutePath
+    def outputFile = Paths.get(binDir.absolutePath, "${project.name}").toFile().absolutePath
+    commandLine nativeExec.get(), '-jar', fatJar, '-o', outputFile
 }
