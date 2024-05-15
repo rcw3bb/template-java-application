@@ -40,9 +40,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
 
     implementation 'commons-cli:commons-cli:1.7.0'
     implementation 'xyz.ronella.casual:trivial-chunk:2.18.0'
@@ -74,7 +73,7 @@ jlink {
     launcher{
         moduleName = application.mainModule
         mainClassName = application.mainClass
-        jvmArgs = ['-Dlog4j.configurationFile={{BIN_DIR}}\\conf\\log4j2.xml']
+        jvmArgs = ['-Dlogback.configurationFile={{BIN_DIR}}\\conf\\logback.xml']
     }
     imageName = packageName.toString()
 }
@@ -121,8 +120,8 @@ task preparePackage(dependsOn: ['jlink']) {
         def jlinkBinDir = Paths.get(jlinkTargetDir.toString(), 'bin')
         def jlinkConfDir = Paths.get(jlinkBinDir.toFile().absolutePath, "..", confDirectory)
 
-        def log4jFile = "log4j2.xml"
-        def log4jPath = Paths.get(jlinkConfDir.toFile().absolutePath, log4jFile).toFile()
+        def logbackFile = "logback.xml"
+        def logbackPath = Paths.get(jlinkConfDir.toFile().absolutePath, logbackFile).toFile()
 
         def mainResources = sourceSets.main.resources.sourceDirectories.asPath
 
@@ -149,13 +148,13 @@ task preparePackage(dependsOn: ['jlink']) {
             }
         }
 
-        if (log4jPath.exists()) {
+        if (logbackPath.exists()) {
             def pattern = "logs/"
             def replaceWith = "../${pattern}"
-            def content = log4jPath.text
+            def content = logbackPath.text
             def updatedContent = content.replace(pattern, replaceWith)
             if (content != updatedContent) {
-                log4jPath.write(updatedContent)
+                logbackPath.write(updatedContent)
             }
         }
     }
@@ -187,5 +186,5 @@ task buildExec(type: Exec, group: 'distribution', dependsOn: [shadowJar]) {
     def libsDir = Paths.get(buildDir.absolutePath, 'libs').toFile().absolutePath
     def fatJar = Paths.get(libsDir, "${packageName}-exe.jar").toFile().absolutePath
     def outputFile = Paths.get(binDir.absolutePath, "${project.name}").toFile().absolutePath
-    commandLine nativeExec.get(), '-jar', fatJar, '-o', outputFile
+    commandLine nativeExec.get(), '--no-fallback', '-jar', fatJar, '-o', outputFile
 }
