@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 
 buildscript {
     dependencies {
-        classpath 'xyz.ronella.casual:trivial-chunk:2.18.0'
+        classpath 'xyz.ronella.casual:trivial-chunk:2.20.0'
     }
 }
 
@@ -32,7 +32,10 @@ application {
 }
 
 shadowJar {
-    archiveClassifier.set("exe")
+    archiveClassifier.set("fat")
+    minimize {
+        exclude(dependency('ch.qos.logback:.*:.*'))
+    }
 }
 
 repositories {
@@ -43,8 +46,8 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.13'
     implementation 'ch.qos.logback:logback-classic:1.5.6'
 
-    implementation 'commons-cli:commons-cli:1.7.0'
-    implementation 'xyz.ronella.casual:trivial-chunk:2.18.0'
+    implementation 'commons-cli:commons-cli:1.8.0'
+    implementation 'xyz.ronella.casual:trivial-chunk:2.20.0'
     implementation 'xyz.ronella.logging:logger-plus:1.2.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
@@ -99,7 +102,7 @@ jar {
 
 pmd {
     consoleOutput = true
-    toolVersion = "6.51.0"
+    toolVersion = "6.55.0"
     rulesMinimumPriority = 5
     ruleSetFiles = files('quality/pmd/java/custom.xml')
     ruleSets = []
@@ -163,7 +166,6 @@ task preparePackage(dependsOn: ['jlink']) {
 tasks.findByPath('jlink').finalizedBy(preparePackage)
 
 task packWin(group: 'distribution', dependsOn: ['jlink']) {
-    group = "build"
     doLast {
         def jlinkOutputDir = Paths.get(buildDir.absolutePath, packageName)
         def outputFile = Paths.get(buildDir.absolutePath, 'pack', "${packageName}-win64.zip")
@@ -173,18 +175,37 @@ task packWin(group: 'distribution', dependsOn: ['jlink']) {
     }
 }
 
-task buildExec(type: Exec, group: 'distribution', dependsOn: [shadowJar]) {
-    def binDir = Paths.get(buildDir.absolutePath, 'bin').toFile()
+task packImage(group: 'distribution', dependsOn: ['buildExec']) {
+    doLast {
+        def imageOutputDir = Paths.get(buildDir.absolutePath, 'image')
+        def outputFile = Paths.get(buildDir.absolutePath, 'pack', "${packageName}-image.zip")
+        ant.zip(destfile: outputFile) {
+            fileset(dir: imageOutputDir)
+        }
+    }
+}
+
+task buildExec(group: 'build', dependsOn: [shadowJar]) {
+    def imageDir = Paths.get(buildDir.absolutePath, 'image').toFile()
 
     doFirst {
-        if (!binDir.exists()) {
-            binDir.mkdirs()
+        if (!imageDir.exists()) {
+            imageDir.mkdirs()
         }
     }
 
-    def nativeExec = CommandLocator.locateAsString("native-image")
-    def libsDir = Paths.get(buildDir.absolutePath, 'libs').toFile().absolutePath
-    def fatJar = Paths.get(libsDir, "${packageName}-exe.jar").toFile().absolutePath
-    def outputFile = Paths.get(binDir.absolutePath, "${project.name}").toFile().absolutePath
-    commandLine nativeExec.get(), '--no-fallback', '-jar', fatJar, '-o', outputFile
+    doLast {
+        exec {
+            def nativeExec = CommandLocator.locateAsString("native-image")
+            def libsDir = Paths.get(buildDir.absolutePath, 'libs').toFile().absolutePath
+            def fatJar = Paths.get(libsDir, "${packageName}-fat.jar").toFile().absolutePath
+            def outputFile = Paths.get(imageDir.absolutePath, "${project.name}").toFile().absolutePath
+            commandLine nativeExec.get(), '--no-fallback', '-jar', fatJar, '-o', outputFile
+        }
+        copy {
+            from(Paths.get(buildDir.absolutePath, "resources", "main"))
+            into(Paths.get(imageDir.absolutePath, "conf"))
+            include 'logback.xml'
+        }
+    }
 }

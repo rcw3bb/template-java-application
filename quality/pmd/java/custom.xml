@@ -18,6 +18,9 @@
     <rule ref="category/java/errorprone.xml" />
     <rule ref="category/java/bestpractices.xml/AvoidPrintStackTrace" />
     <rule ref="category/java/bestpractices.xml/LooseCoupling" />
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryImport" />
     <rule ref="category/java/design.xml/ExcessiveMethodLength">
         <properties>
@@ -29,5 +32,9 @@
             <property name="minimum" value="17" />
         </properties>
     </rule>
-
+    <rule ref="category/java/documentation.xml/CommentRequired">
+        <properties>
+            <property name="fieldCommentRequirement" value="Ignored"/>
+        </properties>
+    </rule>
 </ruleset>

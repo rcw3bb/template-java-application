@@ -1,15 +1,28 @@
-package xyz.ronella.template.app;
+package xyz.ronella.template.app.util;
 
 import org.apache.commons.cli.*;
 
+/**
+ * The ArgsMgr class is the class that manages the command line arguments.
+ *
+ * @since 1.0.0
+ */
 public class ArgsMgr {
 
     private String name;
 
+    /**
+     * The shouldExit method returns true if the application should exit.
+     * @return True if the application should exit.
+     */
     public boolean shouldExit() {
         return exit;
     }
 
+    /**
+     * The setShouldExit method sets the exit flag.
+     * @param exit The exit flag.
+     */
     public void setShouldExit(boolean exit) {
         this.exit = exit;
     }
@@ -19,10 +32,18 @@ public class ArgsMgr {
     private ArgsMgr() {
     }
 
+    /**
+     * The setName method sets the name of a person.
+     * @param name The name of a person.
+     */
     public void setName(final String name) {
         this.name = name;
     }
 
+    /**
+     * The getName method returns the name of a person.
+     * @return The name of a person.
+     */
     public String getName() {
         return this.name;
     }
@@ -57,6 +78,11 @@ public class ArgsMgr {
         argMgr.setShouldExit(true);
     }
 
+    /**
+     * Build an instance of ArgsMgr.
+     * @param args The command line arguments.
+     * @return An instance of ArgsMgr.
+     */
     public static ArgsMgr build(String[] args) {
         final var argManager = new ArgsMgr();
         final var options = new Options();
