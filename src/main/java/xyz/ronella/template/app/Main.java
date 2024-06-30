@@ -12,7 +12,7 @@ import xyz.ronella.trivial.handy.PathFinder;
  *
  * @since 1.0.0
  */
-public class Main {
+final public class Main {
 
     static {
         final var confDir = FileMgr.getConfDir();

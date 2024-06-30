@@ -7,7 +7,7 @@ import org.apache.commons.cli.*;
  *
  * @since 1.0.0
  */
-public class ArgsMgr {
+final public class ArgsMgr {
 
     private String name;
 
