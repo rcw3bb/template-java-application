@@ -95,7 +95,7 @@ final public class ArgsMgr {
         CommandLine cmd = null;
 
         try {
-            cmd = parser.parse(options, args);
+            cmd = parser.parse(options, args, /*Stop at non-option*/ true);
             if (cmd.hasOption("help")) {
                 helpInfo(argManager, options);
             } else {
