@@ -22,9 +22,11 @@
     <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
     <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryImport" />
-    <rule ref="category/java/design.xml/ExcessiveMethodLength">
+    <rule ref="category/java/design.xml/NcssCount">
         <properties>
-            <property name="minimum" value="30" />
+            <property name="methodReportLevel" value="30" />
+            <property name="classReportLevel" value="1500" />
+            <property name="ncssOptions" value="" />
         </properties>
     </rule>
     <rule ref="category/java/codestyle.xml/LongVariable">
