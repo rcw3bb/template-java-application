@@ -5,6 +5,10 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import java.text.SimpleDateFormat
 
 buildscript {
+    configurations.classpath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+
     dependencies {
         classpath libs.trivial.chunk
     }
