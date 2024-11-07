@@ -1,5 +1,7 @@
 # Build
 
+[TOC]
+
 ## Pre-requisite
 
 * [BuildTools for Visual Studio](https://visualstudio.microsoft.com/downloads/)
@@ -51,3 +53,14 @@ gradlew packWin
 >
 > REPO_DIR is the location where you've cloned the repository.
 
+## Locking Dependencies
+
+Lock the dependencies to make the build reproducible using the following command:
+
+```
+gradlew dependencies --write-locks
+```
+
+The preceding command will create the lock files *(e.g. gradle.lockfile and settings-gradle.lockfile)* that must be part of the source control. If the lock files are already existing it will be overwritten. 
+
+> There are no lock files in this repository since its a template. Always start the development as much as possible with the latest stable versions.
