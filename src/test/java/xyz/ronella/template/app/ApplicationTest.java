@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-public class MainTest {
+public class ApplicationTest {
 
     @Test
     public void helloWorld() {
-        var main = new Main();
+        var main = new Application();
         assertEquals("Hello World", main.hello("World"));
     }
 

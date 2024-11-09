@@ -12,7 +12,7 @@ import xyz.ronella.trivial.handy.PathFinder;
  *
  * @since 1.0.0
  */
-final public class Main {
+public class Application {
 
     static {
         final var confDir = FileMgr.getConfDir();
@@ -30,7 +30,7 @@ final public class Main {
         });
     }
 
-    private final static LoggerPlus LOGGER_PLUS = new LoggerPlus(LoggerFactory.getLogger(Main.class));
+    private final static LoggerPlus LOGGER_PLUS = new LoggerPlus(LoggerFactory.getLogger(Application.class));
 
     /**
      * The main method.
@@ -52,7 +52,7 @@ final public class Main {
                 return;
             }
 
-            final var main = new Main();
+            final var main = new Application();
             mLOG.info(main.hello(argsMgr.getName()));
         }
     }
