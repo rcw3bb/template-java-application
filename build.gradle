@@ -116,13 +116,15 @@ pmdTest.enabled = false
 task preparePackage(dependsOn: ['jlink']) {
     group = "build"
     doLast {
-        def projectName = packageName.toString()
+
         def confDirectory = "conf"
+        def buildPath = layout.buildDirectory
+        def projectPath = buildPath.dir(packageName)
 
         def batchFile = "${project.name}.bat"
-        def batchPath = Paths.get(buildDir.absolutePath, projectName, batchFile).toFile()
+        def batchPath = projectPath.map { it.file(batchFile) }.get().asFile
 
-        def jlinkTargetDir = Paths.get(buildDir.absolutePath, projectName)
+        def jlinkTargetDir = projectPath.get().asFile.toPath()
         def jlinkBinDir = Paths.get(jlinkTargetDir.toString(), 'bin')
         def jlinkConfDir = Paths.get(jlinkBinDir.toFile().absolutePath, "..", confDirectory)
 
@@ -132,8 +134,8 @@ task preparePackage(dependsOn: ['jlink']) {
         def mainResources = sourceSets.main.resources.sourceDirectories.asPath
 
         copy {
-            from(Paths.get(buildDir.absolutePath, projectName, "bin"))
-            into(Paths.get(buildDir.absolutePath, projectName))
+            from(projectPath.map { it.dir("bin") }.get().asFile.toPath())
+            into(projectPath.get().asFile.toPath())
             include batchFile
         }
 
@@ -170,8 +172,12 @@ tasks.findByPath('jlink').finalizedBy(preparePackage)
 
 task packWin(group: 'distribution', dependsOn: ['jlink']) {
     doLast {
-        def jlinkOutputDir = Paths.get(buildDir.absolutePath, packageName)
-        def outputFile = Paths.get(buildDir.absolutePath, 'pack', "${packageName}-win64.zip")
+        def buildPath = layout.buildDirectory
+        def jlinkOutputDir = buildPath.dir(packageName).get().asFile.toPath()
+        def outputFile = buildPath.dir("pack").map {
+            it.file("${packageName}-win64.zip")
+        }.get().asFile.toPath()
+
         ant.zip(destfile: outputFile) {
             fileset(dir: jlinkOutputDir)
         }
@@ -180,8 +186,12 @@ task packWin(group: 'distribution', dependsOn: ['jlink']) {
 
 task packImage(group: 'distribution', dependsOn: ['buildExec']) {
     doLast {
-        def imageOutputDir = Paths.get(buildDir.absolutePath, 'image')
-        def outputFile = Paths.get(buildDir.absolutePath, 'pack', "${packageName}-image.zip")
+        def buildPath = layout.buildDirectory
+        def imageOutputDir = buildPath.dir("image").get().asFile.toPath()
+        def outputFile = buildPath.dir("pack").map {
+            it.file("${packageName}-image.zip")
+        }.get().asFile.toPath()
+
         ant.zip(destfile: outputFile) {
             fileset(dir: imageOutputDir)
         }
@@ -189,7 +199,8 @@ task packImage(group: 'distribution', dependsOn: ['buildExec']) {
 }
 
 task buildExec(group: 'build', dependsOn: [shadowJar]) {
-    def imageDir = Paths.get(buildDir.absolutePath, 'image').toFile()
+    def buildPath = layout.buildDirectory
+    def imageDir = buildPath.dir("image").get().asFile
 
     doFirst {
         if (!imageDir.exists()) {
@@ -200,13 +211,13 @@ task buildExec(group: 'build', dependsOn: [shadowJar]) {
     doLast {
         exec {
             def nativeExec = CommandLocator.locateAsString("native-image")
-            def libsDir = Paths.get(buildDir.absolutePath, 'libs').toFile().absolutePath
+            def libsDir = buildPath.dir("libs").get().asFile.toPath().toFile().absolutePath
             def fatJar = Paths.get(libsDir, "${packageName}-fat.jar").toFile().absolutePath
             def outputFile = Paths.get(imageDir.absolutePath, "${project.name}").toFile().absolutePath
             commandLine nativeExec.get(), '--no-fallback', '-jar', fatJar, '-o', outputFile
         }
         copy {
-            from(Paths.get(buildDir.absolutePath, "resources", "main"))
+            from(buildPath.dir("resources/main").get().asFile.toPath())
             into(Paths.get(imageDir.absolutePath, "conf"))
             include 'logback.xml'
         }
