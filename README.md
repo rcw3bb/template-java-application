@@ -8,13 +8,7 @@ A basic gradle project for java application development.
 
 2. Remove the **.git folder** from where you've cloned the repository.
 
-3. Run the following command:
-
-   ```
-   gradlew test
-   ```
-
-   > If it completes successfully your setup is good.
+3. **Test** using the testing section on [build](BUILD.md) document.
 
 ## License
 
