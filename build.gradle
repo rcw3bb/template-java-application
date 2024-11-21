@@ -26,6 +26,10 @@ plugins {
 group GROUP
 version VERSION
 
+configurations {
+    mockitoAgent
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
@@ -57,6 +61,9 @@ dependencies {
     implementation libs.trivial.chunk
 
     testImplementation testLibs.bundles.unit.test
+    mockitoAgent(testLibs.mockito.core) {
+        transitive = false
+    }
 }
 
 ext {
@@ -69,6 +76,7 @@ ext {
 }
 
 test {
+    jvmArgs("-javaagent:${configurations.mockitoAgent.asPath}")
     dependsOn(pmdMain)
     finalizedBy(jacocoTestReport)
     useJUnitPlatform()
