@@ -4,7 +4,6 @@ import xyz.ronella.logging.LoggerPlus;
 import org.slf4j.LoggerFactory;
 import xyz.ronella.template.app.util.AppInfo;
 import xyz.ronella.template.app.util.ArgsMgr;
-import xyz.ronella.template.app.util.FileMgr;
 import xyz.ronella.trivial.handy.PathFinder;
 
 /**
@@ -15,19 +14,20 @@ import xyz.ronella.trivial.handy.PathFinder;
 public class Application {
 
     static {
-        final var confDir = FileMgr.getConfDir();
-        confDir.ifPresent(___confDir -> {
-            final var logPath = PathFinder.getBuilder("logback.xml")
-                    .addPaths(".", ___confDir.getAbsolutePath())
-                    .build();
-            final var optLogFile = logPath.getFile();
-            if (optLogFile.isPresent()) {
-                final var logFile = optLogFile.get();
-                if (logFile.exists()) {
-                    System.setProperty("logback.configurationFile", logFile.getAbsolutePath());
-                }
-            }
-        });
+        final var userDir = "user.dir";
+        final var confDir = System.getProperty(userDir) + "/conf";
+        final var logPath = PathFinder.getBuilder("logback.xml")
+                .addSysProps(userDir)
+                .addPaths(confDir, "..", "../conf")
+                .build();
+        final var optLogFile = logPath.getFile();
+
+        if (optLogFile.isPresent()) {
+            final var logSysProp = "logback.configurationFile";
+            final var logFile = optLogFile.get().getAbsolutePath();
+            System.out.printf("%s: %s%n", logSysProp, logFile);
+            System.setProperty(logSysProp, logFile);
+        }
     }
 
     private final static LoggerPlus LOGGER_PLUS = new LoggerPlus(LoggerFactory.getLogger(Application.class));
@@ -45,6 +45,7 @@ public class Application {
                     , appInfo.getBuildDate()
             );
             mLOG.info(header);
+            mLOG.info("Working Directory: %s%n", System.getProperty("user.dir"));
 
             final var argsMgr = ArgsMgr.build(args);
 
