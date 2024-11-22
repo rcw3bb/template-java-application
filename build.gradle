@@ -21,6 +21,7 @@ plugins {
     alias(libs.plugins.moduleplugin)
     alias(libs.plugins.jlink)
     alias(libs.plugins.shadow)
+    //alias(libs.plugins.snyk)
 }
 
 group GROUP
@@ -79,6 +80,7 @@ test {
     jvmArgs("-javaagent:${configurations.mockitoAgent.asPath}")
     dependsOn(pmdMain)
     finalizedBy(jacocoTestReport)
+    //finalizedBy('snyk-test')
     useJUnitPlatform()
 }
 
@@ -109,7 +111,9 @@ jar {
                 "Implementation-Version": project.version
         )
     }
-    dependsOn test
+    dependsOn(test
+            //,'snyk-monitor'
+    )
 }
 
 pmd {
@@ -121,6 +125,14 @@ pmd {
 }
 
 pmdTest.enabled = false
+
+/*snyk {
+    arguments = '--all-sub-projects'
+    severity = 'low'
+    api = "${snykToken}"
+    autoDownload = true
+    autoUpdate = true
+}*/
 
 task preparePackage(dependsOn: ['jlink']) {
     group = "build"
