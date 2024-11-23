@@ -46,6 +46,9 @@ shadowJar {
     minimize {
         exclude(dependency('ch.qos.logback:.*:.*'))
     }
+    dependsOn(test
+            //,'snyk-monitor'
+    )
 }
 
 repositories {
