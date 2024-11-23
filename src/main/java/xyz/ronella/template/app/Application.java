@@ -45,7 +45,7 @@ public class Application {
                     , appInfo.getBuildDate()
             );
             mLOG.info(header);
-            mLOG.info("Working Directory: %s%n", System.getProperty("user.dir"));
+            mLOG.info("Working Directory: %s", System.getProperty("user.dir"));
 
             final var argsMgr = ArgsMgr.build(args);
 
