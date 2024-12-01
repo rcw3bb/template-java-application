@@ -29,11 +29,14 @@ version VERSION
 
 configurations {
     mockitoAgent
+    pmdTool
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+    withJavadocJar()
+    withSourcesJar()
 }
 
 application {
@@ -46,9 +49,8 @@ shadowJar {
     minimize {
         exclude(dependency('ch.qos.logback:.*:.*'))
     }
-    dependsOn(test
-            //,'snyk-monitor'
-    )
+    dependsOn(test)
+    //dependsOn('snyk-monitor')
 }
 
 repositories {
@@ -68,6 +70,8 @@ dependencies {
     mockitoAgent(testLibs.mockito.core) {
         transitive = false
     }
+
+    pmdTool libs.pmd //This must be the only dependency attached to the pmdTool configuration.
 }
 
 ext {
@@ -114,17 +118,18 @@ jar {
                 "Implementation-Version": project.version
         )
     }
-    dependsOn(test
-            //,'snyk-monitor'
-    )
+    dependsOn(test)
+    //dependsOn('snyk-monitor')
+    finalizedBy(javadocJar)
 }
 
 pmd {
     consoleOutput = true
-    toolVersion = "7.7.0"
+    toolVersion = configurations.pmdTool.resolvedConfiguration.firstLevelModuleDependencies.moduleVersion.first
     rulesMinimumPriority = 5
     ruleSetFiles = files('quality/pmd/java/custom.xml')
     ruleSets = []
+    logger.lifecycle("PMD version: ${pmd.toolVersion}")
 }
 
 pmdTest.enabled = false

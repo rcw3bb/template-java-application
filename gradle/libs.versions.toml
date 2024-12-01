@@ -8,6 +8,7 @@ module-plugin-version = { require = "latest.release"}
 jlink-version = { require = "latest.release"}
 shadow-version = { require = "latest.release"}
 #snyk-version = { require = "latest.release" }
+pmd-version = { require = "latest.release" }
 
 [libraries]
 slf4j-api = {module = "org.slf4j:slf4j-api", version.ref = "slf4j-api-version" }
@@ -15,6 +16,7 @@ logback-classic = {module = "ch.qos.logback:logback-classic", version.ref = "log
 logger-plus = { module = "xyz.ronella.logging:logger-plus", version.ref = "logger-plus-version" }
 trivial-chunk = { module = "xyz.ronella.casual:trivial-chunk", version.ref = "trivial-chunk-version" }
 commons-cli = { module = "commons-cli:commons-cli", version.ref = "commons-cli-version" }
+pmd = { module = "net.sourceforge.pmd:pmd", version.ref = "pmd-version" }
 
 [bundles]
 logger = ["slf4j-api", "logback-classic", "logger-plus"]
